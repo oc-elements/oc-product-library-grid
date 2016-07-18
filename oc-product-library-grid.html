@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`oc-product-library-grid`
+A grid to display product library items
+
+@demo demo/index.html 
+-->
+
+<dom-module id="oc-product-library-grid">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'oc-product-library-grid',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'oc-product-library-grid',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
