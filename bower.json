@@ -5,7 +5,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "iron-data-table": "1.0.0",
-    "oc-iron-data-table-styles": "https://github.com/oc-elements/oc-iron-data-table-styles.git"
+    "oc-iron-data-table-styles": "https://github.com/oc-elements/oc-iron-data-table-styles.git",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^1.3.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

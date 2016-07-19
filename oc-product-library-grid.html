@@ -1,10 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-data-table/iron-data-table.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<!--<link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">-->
 
 <!--
 `oc-product-library-grid`
 A grid to display product library items
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="oc-product-library-grid">
@@ -14,7 +17,27 @@ A grid to display product library items
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+
+    <iron-data-table items="[[data]]">
+      <data-table-column name="Name" sort-by="name">
+        <template>[[item.name]]</template>
+      </data-table-column>
+      <data-table-column name="Display Name">
+        <template>[[item.displayName]]</template>
+      </data-table-column>
+      <data-table-column name="Options">
+        <template is="dom-repeat" item="[[item.options]]" as="option">[[option.name]]</template>
+      </data-table-column>
+      <data-table-column name="Enabled">
+        <template>
+          <paper-checkbox checked="[[item.enabled]]"></paper-checkbox>
+        </template>
+      </data-table-column>
+      <data-table-column name="Actions">
+        <template>[[item.name.first]]</template>
+      </data-table-column>
+    </iron-data-table>
+
   </template>
 
   <script>
@@ -23,9 +46,8 @@ A grid to display product library items
       is: 'oc-product-library-grid',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'oc-product-library-grid',
+        data : {
+          type: Array
         },
       },
 
