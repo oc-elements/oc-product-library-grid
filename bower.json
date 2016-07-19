@@ -3,7 +3,9 @@
   "description": "A grid to display product library items",
   "main": "oc-product-library-grid.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "iron-data-table": "1.0.0",
+    "oc-iron-data-table-styles": "https://github.com/oc-elements/oc-iron-data-table-styles.git"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
