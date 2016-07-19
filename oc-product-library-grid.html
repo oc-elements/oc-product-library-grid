@@ -23,19 +23,26 @@ A grid to display product library items
       <data-table-column name="Name" sort-by="name">
         <template>[[item.name]]</template>
       </data-table-column>
-      <data-table-column name="Display Name">
+      <data-table-column name="Display Name" sort-by="displayName">
         <template>[[item.displayName]]</template>
       </data-table-column>
-      <data-table-column name="Options">
+      <data-table-column name="Options" sort-by="options">
         <template is="dom-repeat" item="[[item.options]]" as="option">[[option.name]]</template>
       </data-table-column>
-      <data-table-column name="Enabled">
+      <data-table-column name="Enabled" sort-by="enabled">
         <template>
-          <paper-checkbox checked="[[item.enabled]]"></paper-checkbox>
+          <paper-checkbox checked="[[item.enabled]]" on-change="_enabledHandler"></paper-checkbox>
         </template>
       </data-table-column>
       <data-table-column name="Actions">
-        <template>[[item.name.first]]</template>
+        <template>
+
+          <div data-option-object$="{{item}}">
+            <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
+            <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
+          </div>
+
+        </template>
       </data-table-column>
     </iron-data-table>
 
@@ -51,6 +58,20 @@ A grid to display product library items
           type: Array
         },
       },
+
+      _actionHandler : function(e) {
+        var optionObj = Polymer.dom(event).localTarget.parentElement.getAttribute('data-option-object'),
+                action = e.target.getAttribute('id');
+
+        this.fire('on-'+action, optionObj);
+      },
+
+      _enabledHandler: function(e){
+        var status = Polymer.dom(e).localTarget.hasAttribute('checked');
+        this.fire('on-enabled-toggle', status);
+      }
+
+
 
     });
   </script>
