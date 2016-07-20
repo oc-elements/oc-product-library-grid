@@ -23,7 +23,7 @@ A grid to display product library items
 
     <paper-input label="Filter" always-float-label value="{{filter}}"></paper-input>
 
-    <iron-data-table filter='{{filterObj}}' items="[[data]]">
+    <iron-data-table filter='{{filterObj}}' items="[[data]]" >
       <data-table-column name="Name" sort-by="name">
         <template>[[item.name]]</template>
       </data-table-column>
