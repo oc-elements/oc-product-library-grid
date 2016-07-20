@@ -3,6 +3,7 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../mercury-paginator/mercury-paginator.html">
 <!--<link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">-->
 
 <!--
@@ -20,9 +21,9 @@ A grid to display product library items
       }
     </style>
 
-    <paper-input value="{{filter}}"></paper-input>
+    <paper-input label="Filter" always-float-label value="{{filter}}"></paper-input>
 
-    <iron-data-table filter='[{"path": "displayName", "filter": "andries"}]' items="[[data]]">
+    <iron-data-table filter='{{filterObj}}' items="[[data]]">
       <data-table-column name="Name" sort-by="name">
         <template>[[item.name]]</template>
       </data-table-column>
@@ -43,11 +44,16 @@ A grid to display product library items
           <div data-option-object$="{{item}}">
             <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
             <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
+            <paper-icon-button id="d" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
           </div>
 
         </template>
       </data-table-column>
     </iron-data-table>
+
+    <oc-grid-actions >
+
+    </oc-grid-actions>
 
   </template>
 
@@ -64,6 +70,13 @@ A grid to display product library items
           type: String,
           value : function(){
             return ""
+          },
+          observer: "_filterHandler"
+        },
+        filterObj : {
+          type: Object,
+          value: function(){
+            return {}
           }
         }
       },
@@ -78,6 +91,17 @@ A grid to display product library items
       _enabledHandler: function(e){
         var status = Polymer.dom(e).localTarget.hasAttribute('checked');
         this.fire('on-enabled-toggle', status);
+      },
+
+      _filterHandler : function(filterValue){
+        this.filterObj = [{"path" : "name"}, {"path" : "displayName"}];
+
+        for(var i=0; i<this.filterObj.length; i++){
+          this.filterObj[i].filter = filterValue || "";
+        }
+
+        console.log(this.filterObj);
+
       }
 
 
