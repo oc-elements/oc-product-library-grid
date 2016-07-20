@@ -44,16 +44,11 @@ A grid to display product library items
           <div data-option-object$="{{item}}">
             <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
             <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
-            <paper-icon-button id="d" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
           </div>
 
         </template>
       </data-table-column>
     </iron-data-table>
-
-    <oc-grid-actions >
-
-    </oc-grid-actions>
 
   </template>
 
