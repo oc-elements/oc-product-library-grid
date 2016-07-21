@@ -4,8 +4,8 @@
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../mercury-paginator/mercury-paginator.html">
-<!--<link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">-->
-
+<link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">
+<link rel="import" href="../oc-product-library-api/oc-product-library-api.html">
 <!--
 `oc-product-library-grid`
 A grid to display product library items
@@ -15,11 +15,13 @@ A grid to display product library items
 
 <dom-module id="oc-product-library-grid">
   <template>
-    <style>
+    <style include="oc-iron-data-table-styles">
       :host {
         display: block;
       }
     </style>
+
+    <oc-product-library-api id="prodLibApi"></oc-product-library-api>
 
     <paper-input label="Filter" always-float-label value="{{filter}}"></paper-input>
 
@@ -76,6 +78,17 @@ A grid to display product library items
         }
       },
 
+      ready : function(){
+        this.loading = true;
+        this.$.prodLibApi.getProductOptionSets()
+                .then(this._setPropertyResponseResults.bind(this, "data"))
+                .then(function(){console.log((this.data))}.bind(this))
+                .catch(console.error())
+                .finally(this.set.bind(this, "loading", false));
+
+
+      },
+
       _actionHandler : function(e) {
         var optionObj = Polymer.dom(event).localTarget.parentElement.getAttribute('data-option-object'),
                 action = e.target.getAttribute('id');
@@ -94,8 +107,6 @@ A grid to display product library items
         for(var i=0; i<this.filterObj.length; i++){
           this.filterObj[i].filter = filterValue || "";
         }
-
-        console.log(this.filterObj);
 
       }
 
