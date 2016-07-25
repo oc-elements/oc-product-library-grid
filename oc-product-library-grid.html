@@ -1,9 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../oc-core-utils/oc-api-consumer-behaviour.html">
 <link rel="import" href="../iron-data-table/iron-data-table.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../mercury-paginator/mercury-paginator.html">
+<link rel="import" href="../oc-grid-controls/oc-grid-controls.html">
 <link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">
 <link rel="import" href="../oc-product-library-api/oc-product-library-api.html">
 <!--
@@ -21,68 +23,88 @@ A grid to display product library items
       }
     </style>
 
+    <app-location route="{{route}}"></app-location>
+    <app-route route="{{route}}" pattern="/option-sets" query-params="{{queryParams}}" active>
+    </app-route>
+
     <oc-product-library-api id="prodLibApi"></oc-product-library-api>
 
-    <paper-input label="Filter" always-float-label value="{{filter}}"></paper-input>
+    <oc-grid-controls data="{{data}}">
 
-    <iron-data-table filter='{{filterObj}}' items="[[data]]" >
-      <data-table-column name="Name" sort-by="name">
-        <template>[[item.name]]</template>
-      </data-table-column>
-      <data-table-column name="Display Name" sort-by="displayName">
-        <template>[[item.displayName]]</template>
-      </data-table-column>
-      <data-table-column name="Options" sort-by="options">
-        <template is="dom-repeat" item="[[item.options]]" as="option">[[option.name]]</template>
-      </data-table-column>
-      <data-table-column name="Enabled" sort-by="enabled">
-        <template>
-          <paper-checkbox checked="[[item.enabled]]" on-change="_enabledHandler"></paper-checkbox>
-        </template>
-      </data-table-column>
-      <data-table-column name="Actions">
-        <template>
+      <iron-data-table>
+        <data-table-column name="Name" sort-by="name">
+          <template>[[item.name]]</template>
+        </data-table-column>
+        <data-table-column name="Display Name" sort-by="displayName">
+          <template>[[item.displayName]]</template>
+        </data-table-column>
+        <data-table-column name="Options" sort-by="options">
+          <template is="dom-repeat" item="[[item.options]]" as="option">[[option.name]]</template>
+        </data-table-column>
+        <data-table-column name="Enabled" sort-by="enabled">
+          <template>
+            <paper-checkbox checked="[[item.enabled]]" on-change="_enabledHandler"></paper-checkbox>
+          </template>
+        </data-table-column>
+        <data-table-column name="Actions">
+          <template>
 
-          <div data-option-object$="{{item}}">
-            <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
-            <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
-          </div>
+            <div data-option-object$="{{item}}">
+              <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
+              <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
+            </div>
 
-        </template>
-      </data-table-column>
-    </iron-data-table>
+          </template>
+        </data-table-column>
+      </iron-data-table>
+
+    </oc-grid-controls>
+
+
 
   </template>
 
   <script>
+
+    var itemsPerPage = 10;
+
     Polymer({
 
       is: 'oc-product-library-grid',
+      behaviors: [OC.Behaviours.ApiConsumer],
 
       properties: {
-        data : {
+        loading: {
+          type: Boolean,
+          notify: true
+        },
+
+        data: {
           type: Array
         },
-        filter : {
-          type: String,
-          value : function(){
-            return ""
-          },
-          observer: "_filterHandler"
+
+
+        filterObj: {
+          type: Object
         },
-        filterObj : {
+        queryParams : {
           type: Object,
-          value: function(){
-            return {}
-          }
+          notify: true
         }
       },
 
-      ready : function(){
-        this.loading = true;
+      listeners : {
+        "pager-change" : "pageChange"
+      },
+
+      init : function(){
         this.$.prodLibApi.getProductOptionSets()
-                .then(this._setPropertyResponseResults.bind(this, "data"))
-                .then(function(){console.log((this.data))}.bind(this))
+                .then(function(data){
+//                  console.log(data.response)
+                  this.totalPages = Math.ceil(data.response.count / itemsPerPage);
+                  this.data = data.response.results;
+                }.bind(this))
+                //                .then(function(){console.log((this.data))}.bind(this))
                 .catch(console.error())
                 .finally(this.set.bind(this, "loading", false));
 
@@ -96,19 +118,17 @@ A grid to display product library items
         this.fire('on-'+action, optionObj);
       },
 
+      pageChange : function(event){
+        console.log(event.detail);
+        this.queryParams = {"pageNum" : event.detail.page}
+      },
+
       _enabledHandler: function(e){
         var status = Polymer.dom(e).localTarget.hasAttribute('checked');
         this.fire('on-enabled-toggle', status);
-      },
-
-      _filterHandler : function(filterValue){
-        this.filterObj = [{"path" : "name"}, {"path" : "displayName"}];
-
-        for(var i=0; i<this.filterObj.length; i++){
-          this.filterObj[i].filter = filterValue || "";
-        }
-
       }
+
+
 
 
 
