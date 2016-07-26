@@ -23,13 +23,9 @@ A grid to display product library items
       }
     </style>
 
-    <app-location route="{{route}}"></app-location>
-    <app-route route="{{route}}" pattern="/option-sets" query-params="{{queryParams}}" active>
-    </app-route>
-
     <oc-product-library-api id="prodLibApi"></oc-product-library-api>
 
-    <oc-grid-controls data="{{data}}">
+    <oc-grid-controls data="[[data]]" total-count="[[totalCount]]" current-page="[[page]]">
 
       <iron-data-table>
         <data-table-column name="Name" sort-by="name">
@@ -66,8 +62,6 @@ A grid to display product library items
 
   <script>
 
-    var itemsPerPage = 10;
-
     Polymer({
 
       is: 'oc-product-library-grid',
@@ -83,28 +77,29 @@ A grid to display product library items
           type: Array
         },
 
-
         filterObj: {
           type: Object
         },
-        queryParams : {
-          type: Object,
-          notify: true
+        totalCount : {
+          type: Number
+        },
+
+        page : {
+          type: Number,
+          value: 0
         }
       },
 
       listeners : {
-        "pager-change" : "pageChange"
+        "async-page-request" : "_mockRequestHandler"
       },
 
       init : function(){
         this.$.prodLibApi.getProductOptionSets()
                 .then(function(data){
-//                  console.log(data.response)
-                  this.totalPages = Math.ceil(data.response.count / itemsPerPage);
                   this.data = data.response.results;
+                  this.totalCount = data.response.count;
                 }.bind(this))
-                //                .then(function(){console.log((this.data))}.bind(this))
                 .catch(console.error())
                 .finally(this.set.bind(this, "loading", false));
 
@@ -114,19 +109,15 @@ A grid to display product library items
       _actionHandler : function(e) {
         var optionObj = Polymer.dom(event).localTarget.parentElement.getAttribute('data-option-object'),
                 action = e.target.getAttribute('id');
-
         this.fire('on-'+action, optionObj);
-      },
-
-      pageChange : function(event){
-        console.log(event.detail);
-        this.queryParams = {"pageNum" : event.detail.page}
       },
 
       _enabledHandler: function(e){
         var status = Polymer.dom(e).localTarget.hasAttribute('checked');
         this.fire('on-enabled-toggle', status);
       }
+
+
 
 
 
