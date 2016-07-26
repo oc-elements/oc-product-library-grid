@@ -25,6 +25,7 @@ A grid to display product library items
 
     <oc-product-library-api id="prodLibApi"></oc-product-library-api>
 
+    <paper-button class="new-option-set-button" on-tap="_onCreateTapped" raised>New Option Set</paper-button>
     <oc-grid-controls data="[[data]]" total-count="[[totalCount]]" current-page="[[page]]">
 
       <iron-data-table>
@@ -68,6 +69,8 @@ A grid to display product library items
       behaviors: [OC.Behaviours.ApiConsumer],
 
       properties: {
+        organisationId: Number,
+
         loading: {
           type: Boolean,
           notify: true
@@ -94,16 +97,24 @@ A grid to display product library items
         "async-page-request" : "_mockRequestHandler"
       },
 
+      observers: [
+        'init(organisationId)'
+      ],
+
       init : function(){
         this.$.prodLibApi.getProductOptionSets()
                 .then(function(data){
                   this.data = data.response.results;
                   this.totalCount = data.response.count;
                 }.bind(this))
-                .catch(console.error())
+                .catch(this.fire.bind(this, 'option-set-error', 'Failed to load option sets'))
                 .finally(this.set.bind(this, "loading", false));
 
 
+      },
+
+      _onCreateTapped: function() {
+        this.fire('create');
       },
 
       _actionHandler : function(e) {
