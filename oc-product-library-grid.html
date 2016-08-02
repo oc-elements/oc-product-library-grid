@@ -5,9 +5,11 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../oc-grid-controls/oc-grid-controls.html">
 <link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">
 <link rel="import" href="../oc-product-library-api/oc-product-library-api.html">
+<link rel="import" href="../oc-clone-option/oc-clone-option.html">
 <!--
 `oc-product-library-grid`
 A grid to display product library items
@@ -56,6 +58,13 @@ A grid to display product library items
       </iron-data-table>
 
     </oc-grid-controls>
+
+    <paper-dialog id="modal" modal>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <div class="buttons">
+        <paper-button dialog-confirm autofocus>Tap me to close</paper-button>
+      </div>
+    </paper-dialog>
 
 
 
