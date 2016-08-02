@@ -5,7 +5,7 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-dialog/paper-dialog.html">
+
 <link rel="import" href="../oc-grid-controls/oc-grid-controls.html">
 <link rel="import" href="../oc-iron-data-table-styles/oc-iron-data-table-styles.html">
 <link rel="import" href="../oc-product-library-api/oc-product-library-api.html">
@@ -18,136 +18,140 @@ A grid to display product library items
 -->
 
 <dom-module id="oc-product-library-grid">
-  <template>
-    <style include="oc-iron-data-table-styles">
-      :host {
-        display: block;
-      }
-    </style>
+    <template>
+        <style include="oc-iron-data-table-styles">
+            :host {
+                display: block;
+            }
+        </style>
 
-    <oc-product-library-api id="prodLibApi"></oc-product-library-api>
+        <oc-product-library-api id="prodLibApi"></oc-product-library-api>
 
-    <paper-button class="new-option-set-button" on-tap="_onCreateTapped" raised>New Option Set</paper-button>
-    <oc-grid-controls data="[[data]]" total-count="[[totalCount]]" current-page="[[page]]">
+        <paper-button class="new-option-set-button" on-tap="_onCreateTapped" raised>New Option Set</paper-button>
+        <oc-grid-controls data="[[data]]" total-count="[[totalCount]]" current-page="[[page]]">
 
-      <iron-data-table>
-        <data-table-column name="Name" sort-by="name">
-          <template>[[item.name]]</template>
-        </data-table-column>
-        <data-table-column name="Display Name" sort-by="displayName">
-          <template>[[item.displayName]]</template>
-        </data-table-column>
-        <data-table-column name="Options" sort-by="options">
-          <template is="dom-repeat" item="[[item.options]]" as="option">[[option.name]]</template>
-        </data-table-column>
-        <data-table-column name="Enabled" sort-by="enabled">
-          <template>
-            <paper-checkbox checked="[[item.enabled]]" on-change="_enabledHandler"></paper-checkbox>
-          </template>
-        </data-table-column>
-        <data-table-column name="Actions">
-          <template>
+            <iron-data-table>
+                <data-table-column name="Name" sort-by="name">
+                    <template>[[item.name]]</template>
+                </data-table-column>
+                <data-table-column name="Display Name" sort-by="displayName">
+                    <template>[[item.displayName]]</template>
+                </data-table-column>
+                <data-table-column name="Options" sort-by="options">
+                    <template is="dom-repeat" item="[[item.options]]" as="option">[[option.name]]</template>
+                </data-table-column>
+                <data-table-column name="Enabled" sort-by="enabled">
+                    <template>
+                        <paper-checkbox checked="[[item.enabled]]" on-change="_enabledHandler"></paper-checkbox>
+                    </template>
+                </data-table-column>
+                <data-table-column name="Actions">
+                    <template>
 
-            <div data-option-object$="{{item}}">
-              <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
-              <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-options-id$="{{item.id}}" on-tap="_actionHandler"></paper-icon-button>
-            </div>
+                        <div data-option-object$="{{item}}">
+                            <paper-icon-button id="edit" icon="create" title="Edit Set"  on-tap="_actionHandler"></paper-icon-button>
+                            <paper-icon-button id="clone" icon="content-copy" title="Clone Set" data-option-id$="{{item.id}}" data-option-name$="{{item.name}}" on-tap="_cloneHandler"></paper-icon-button>
+                        </div>
 
-          </template>
-        </data-table-column>
-      </iron-data-table>
+                    </template>
+                </data-table-column>
+            </iron-data-table>
 
-    </oc-grid-controls>
+        </oc-grid-controls>
 
-    <!--<paper-dialog id="cloneModal" always-on-top modal>-->
-    <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>-->
-    <!--<div class="buttons">-->
-    <!--<paper-button dialog-confirm autofocus>Tap me to close</paper-button>-->
-    <!--</div>-->
-    <!--</paper-dialog>-->
+        <oc-clone-option id="cloneOption"></oc-clone-option>
 
 
 
-  </template>
+    </template>
 
-  <script>
+    <script>
 
-    Polymer({
+        Polymer({
 
-      is: 'oc-product-library-grid',
-      behaviors: [OC.Behaviours.ApiConsumer],
+            is: 'oc-product-library-grid',
+            behaviors: [OC.Behaviours.ApiConsumer],
 
-      properties: {
-        organisationId: Number,
+            properties: {
+                organisationId: Number,
 
-        loading: {
-          type: Boolean,
-          notify: true
-        },
+                loading: {
+                    type: Boolean,
+                    notify: true
+                },
 
-        data: {
-          type: Array
-        },
+                data: {
+                    type: Array
+                },
 
-        filterObj: {
-          type: Object
-        },
-        totalCount : {
-          type: Number
-        },
+                filterObj: {
+                    type: Object
+                },
+                totalCount : {
+                    type: Number
+                },
 
-        page : {
-          type: Number,
-          value: 0
-        }
-      },
+                page : {
+                    type: Number,
+                    value: 0
+                }
+            },
 
-      listeners : {
-//        "clone" : "_openDialog"
-      },
+            observers: [
+                'init(organisationId)'
+            ],
 
-      observers: [
-        'init(organisationId)'
-      ],
+            listeners: {
+                "clone" : "_cloneOptions"
+            },
 
-      init : function(){
-        this.$.prodLibApi.getProductOptionSets(1, 10)
-                .then(function(data){
-                  this.data = data.response.results;
-                  this.totalCount = data.response.count;
-                }.bind(this))
-                .catch(this.fire.bind(this, 'option-set-error', 'Failed to load option sets'))
-                .finally(this.set.bind(this, "loading", false));
-
-
-      },
-
-      _onCreateTapped: function() {
-        this.fire('create');
-      },
-
-      _actionHandler : function(e) {
-        var optionObj = Polymer.dom(event).localTarget.parentElement.getAttribute('data-option-object'),
-                action = e.target.getAttribute('id');
-        this.fire(action, optionObj);
-      },
-
-      _enabledHandler: function(e){
-        var status = Polymer.dom(e).localTarget.hasAttribute('checked');
-        this.fire('on-enabled-toggle', status);
-      },
-
-//      _openDialog : function(e){
-//        this.$.cloneModal.open();
-//        console.log(e.detail);
-//      }
+            init : function(){
+                this.$.prodLibApi.getProductOptionSets(1, 10)
+                        .then(function(data){
+                            this.data = data.response.results;
+                            this.totalCount = data.response.count;
+                        }.bind(this))
+                        .catch(this.fire.bind(this, 'option-set-error', 'Failed to load option sets'))
+                        .finally(this.set.bind(this, "loading", false));
 
 
+            },
+
+            _onCreateTapped: function() {
+                this.fire('create');
+            },
+
+            _actionHandler : function(e) {
+                var optionObj = Polymer.dom(e).localTarget.parentElement.getAttribute('data-option-object'),
+                        action = e.target.getAttribute('id');
+                this.fire(action, optionObj);
+            },
+
+            _enabledHandler: function(e){
+                var status = Polymer.dom(e).localTarget.hasAttribute('checked');
+                this.fire('on-enabled-toggle', status);
+            },
+
+            _cloneHandler : function(e){
+                this.$.cloneOption.id = Polymer.dom(e).localTarget.getAttribute('data-option-id');
+                this.$.cloneOption.name = Polymer.dom(e).localTarget.getAttribute('data-option-name');
+                this.$.cloneOption.open();
+            },
+
+            _cloneOptions : function(e){
+                this.loading = true;
+                this.$.prodLibApi.copyOptionSet(e.detail.setId, e.detail.newSetName)
+                        .catch(this.fire.bind(this, 'option-set-error', 'Failed to copy option set'))
+                        .finally(function(){ this.init(); }.bind(this));
+            }
 
 
 
 
 
-    });
-  </script>
+
+
+
+        });
+    </script>
 </dom-module>

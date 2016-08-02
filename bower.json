@@ -11,7 +11,6 @@
     "paper-input": "PolymerElements/paper-input#^1.1.15",
     "oc-paginator": "git://github.com/oc-elements/oc-paginator.git#^1.x",
     "oc-product-library-api": "git://github.com/oc-elements/oc-product-library-api.git#1.x",
-    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0",
     "oc-clone-option": "git://github.com/oc-elements/oc-clone-option.git#1.x"
   },
   "devDependencies": {
