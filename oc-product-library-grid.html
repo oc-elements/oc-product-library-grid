@@ -59,12 +59,12 @@ A grid to display product library items
 
     </oc-grid-controls>
 
-    <paper-dialog id="modal" modal>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-      <div class="buttons">
-        <paper-button dialog-confirm autofocus>Tap me to close</paper-button>
-      </div>
-    </paper-dialog>
+    <!--<paper-dialog id="cloneModal" always-on-top modal>-->
+    <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>-->
+    <!--<div class="buttons">-->
+    <!--<paper-button dialog-confirm autofocus>Tap me to close</paper-button>-->
+    <!--</div>-->
+    <!--</paper-dialog>-->
 
 
 
@@ -103,7 +103,7 @@ A grid to display product library items
       },
 
       listeners : {
-        "async-page-request" : "_mockRequestHandler"
+//        "clone" : "_openDialog"
       },
 
       observers: [
@@ -111,7 +111,7 @@ A grid to display product library items
       ],
 
       init : function(){
-        this.$.prodLibApi.getProductOptionSets()
+        this.$.prodLibApi.getProductOptionSets(1, 10)
                 .then(function(data){
                   this.data = data.response.results;
                   this.totalCount = data.response.count;
@@ -129,13 +129,18 @@ A grid to display product library items
       _actionHandler : function(e) {
         var optionObj = Polymer.dom(event).localTarget.parentElement.getAttribute('data-option-object'),
                 action = e.target.getAttribute('id');
-        this.fire('on-'+action, optionObj);
+        this.fire(action, optionObj);
       },
 
       _enabledHandler: function(e){
         var status = Polymer.dom(e).localTarget.hasAttribute('checked');
         this.fire('on-enabled-toggle', status);
-      }
+      },
+
+//      _openDialog : function(e){
+//        this.$.cloneModal.open();
+//        console.log(e.detail);
+//      }
 
 
 
